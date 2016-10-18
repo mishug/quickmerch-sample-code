@@ -1,0 +1,158 @@
+
+<div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 cntnt-hdng">Product / {{title}}</div>
+<div class="dash-sectn-bg add-product">
+    <form method="post" ng-submit="addProduct(productForm.$valid);" name="productForm" enctype="multipart/form-data" novalidate>
+        <input type="hidden" name="_token" value="{{ csrf_token()}}">
+        <!--input type="hidden" value="" name="userid" ng-model="storedetails.user_id">
+        <input type="hidden" value="" name="storeid" ng-model="storedetails.id" -->
+        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 setting-top-btns">
+
+            <!-- @start left section -->
+            <div class="col-md-9 col-lg-9 col-sm-9 col-xs-9 setting-cntnt-rght add-prdct-lft-cntnt">
+                <div class="add-prodct-hdng"><span>Basic Information</span></div>
+
+                <div class="col-md-6 col-lg-6 col-sm-6 col-xs-12 setting-fields" ng-class="{ 'has-error' : productForm.name.$invalid && productForm.name.$dirty }">
+                    <div> <input type="text" no-special-char  placeholder="Add Product Name" name="name" ng-model="product.name" class="form-control" required> </div>
+                    <div ng-show="(productForm.name.$dirty || submitted) && productForm.name.$error.required"><h4 class="error">Please enter product name.</h4></div>
+                </div>
+
+                <div class="col-md-6 col-lg-6 col-sm-6 col-xs-12 setting-fields" ng-class="{ 'has-error' : productForm.name.$invalid && productForm.name.$dirty }">
+                    <div> <input type="text" placeholder="Product Price" name="price" ng-model="product.price" class="form-control" ng-pattern="/^\d{0,9}(\.\d{1,9})?$/" required> </div>
+                    <div ng-show="(productForm.price.$dirty || submitted) && productForm.price.$error.required"><h4 class="error">Please enter product price.</h4></div>
+                    <div ng-show="(productForm.price.$dirty || submitted) && productForm.price.$error.pattern"><h4 class="error">Please enter valid price.</h4></div>
+                </div>
+
+                <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 setting-fields" ng-class="{ 'has-error' : productForm.description.$invalid && productForm.description.$dirty }">
+                    <textarea  name="description" ng-model="product.description" placeholder="Product Description" placeholder="Product Description" class="store-description-input store-nme" ng-minlength="20" required></textarea>
+                    <div ng-show="(productForm.description.$dirty || submitted) && productForm.description.$error.required"><h4 class="error">Please enter product description.</h4></div>
+                    <div ng-show="(productForm.description.$dirty || submitted) && productForm.description.$error.minlength"><h4 class="error">Please enter product description minimum 20 characters.</h4></div>
+                </div>
+
+                <!--  @start shipping preferences -->
+                <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 setting-fields">
+                    <div class="add-prodct-hdng"><span>Shipping Preferences</span></div>
+                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 setting-fields">
+                        <select ng-options="countries.country for countries in countryList track by countries.id" ng-model="prefrences.country" name="countryname"  class="countries-select">
+                            <option value="" selected>Select Country</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 setting-fields">
+                        <div> 
+                            <input type="text" name="alone_price" placeholder="Alone Price" ng-model="prefrences.alone_price" class="form-control" ng-pattern="/^\d{0,9}(\.\d{1,9})?$/">
+                        </div>
+                        <div ng-show="(productForm.alone_price.$dirty || submitted) && productForm.alone_price.$error.pattern"><h4 class="error">Please enter valid price.</h4></div>
+                    </div>
+                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 setting-fields">
+                        <div> 
+                            <input type="text" name="with_price" placeholder="With Other Products Price" ng-model="prefrences.with_price" class="form-control" ng-pattern="/^\d{0,9}(\.\d{1,9})?$/">
+                        </div>
+                        <div ng-show="(productForm.with_price.$dirty || submitted) && productForm.with_price.$error.pattern"><h4 class="error">Please enter valid price.</h4></div>
+                    </div>
+                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 setting-fields"><button type="button" class="btn btn-primary ad-shipng-btn" ng-click="addPreferences()">Add Shipping</button></div>
+
+                    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 shiping-prefrnce-post" >
+                        <div  ng-model = "shippingOptions" ng-repeat="option in shippingOptions track by $index">
+                            <div class="col-md-3 col-lg-3 col-sm-3 col-xs-3 setting-fields">{{option.country.country}}</div>
+                            <div class="col-md-3 col-lg-3 col-sm-3 col-xs-3 setting-fields">{{option.alone_price| currency}}</div>
+                            <div class="col-md-5 col-lg-5 col-sm-5 col-xs-5 setting-fields">{{option.with_price| currency}}</div>
+                            <a class="cross-img" ng-click=removePreference(option.country.id)><img width="16" height="16" class="deleteOption" src="/lib/img/cancel-blue-icon-nw.png" title="Remove Shipping Option"></a>
+                        </div>
+                    </div>
+                </div>
+                <!--  @ends shipping preferences -->
+
+                <!-- @start product options / variants -->
+                <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 setting-fields">
+                    <div class="add-prodct-hdng"><span>Product Options</span></div>
+                    <!--Product Options-->
+                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 setting-fields"><div> <input type="text" placeholder="Option Name" ng-model="options.name" class="form-control"> </div></div>
+                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 setting-fields">
+                        <div> 
+                            <input type="text" name="stock" placeholder="Number in Stock" ng-model="options.stock" class="form-control"  ng-pattern="/^[0-9]{1,7}$/">
+                        </div>
+                        <div ng-show="(productForm.stock.$dirty || submitted) && productForm.stock.$error.pattern"><h4 class="error">Please enter valid numeric value.</h4></div>
+                    </div>
+                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 setting-fields">
+                        <div> 
+                            <input type="text" name="sold" placeholder="Number Sold"  ng-model="options.sold" class="form-control"  ng-pattern="/^[0-9]{1,7}$/"> 
+                        </div>
+                        <div ng-show="(productForm.sold.$dirty || submitted) && productForm.sold.$error.pattern"><h4 class="error">Please enter valid numeric value.</h4></div>
+                    </div>
+                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 setting-fields"><button type="button" class="btn btn-primary ad-shipng-btn" ng-click="addOptions()">Add Option</button></div>
+                </div>
+
+                <div ng-model="productOptions" class="col-md-12 col-lg-12 col-sm-12 col-xs-12 setting-fields" ng-repeat="option in productOptions track by $index">
+                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 setting-fields">{{option.name|cut:true:20:' ...'}}</div>
+
+                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 setting-fields">{{option.stock}}</div>
+                    <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 setting-fields">{{option.sold}}</div>
+                    
+                    <a class="cross-img" ng-click="removeOptions(option.name)"><img width="16" height="16" class="deleteOption" src="/lib/img/cancel-blue-icon-nw.png" title="Remove Product Option"></a>
+                </div>
+                <!-- @ends product options / variants -->
+
+                <!-- @start image upload section -->
+                <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 setting-fields prodct-img">
+                    <div class="add-prodct-hdng"><span>Product Images</span>
+                        <p class="prodct-img-para">Manage your product photos: Select atleast one image to set as primary image</p>
+                        <div class="button btn btn-default" ng-model="files" ngf-keep="true" ngf-keep-distinct="true" ngf-select ngf-change="upload($files)" ngf-multiple="true" >Upload product images
+                       
+                        </div>
+                          <div ng-show="!imagevalidation  && submitted"><h4 ng-hide="imageslength==true" class="error">Please select one image as primary.</h4></div>
+                    </div>
+                </div>                
+
+                <div ng-repeat="file in files track by $index" id="product-post-nw" ng-init="product.is_primary=0">
+                    <div class="prdct-img"><img  style="height: 100%; width: 100%;" ngf-src="file" ngf-default-src="'/thumb.jpg'" ngf-accept="'image/*'"></div>
+                    <input type="radio" name="is_primary" ng-model="product.is_primary" value ="{{$index}}" ng-required='true' title="Set this as primary image" ng-click="checkprimaryimage()">
+                    <input type="button" value="Remove" class="prdct-remove-btn" ng-click="removeImage($index, 'new')"/>
+                </div>
+                <!-- @ends image upload section -->   
+
+            </div>
+            <!-- @ends left section -->
+
+            <!-- @start right section -->
+            <div class="col-md-3 col-lg-3 col-sm-3 col-xs-3 add-prodct-right-sctn">
+                <div class="add-prodct-right-inner">
+                    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 setting-fields add-product-status right-add-prdct-hdng">
+                        <label class="hdng">Product Status</label>
+                        <div class="right-form" ng-class="{ 'has-error' : productForm.status.$invalid && productForm.status.$dirty }">
+                            <p>
+                                <label><input type="radio" id="RadioGroup1_0" value="active" ng-model="product.status" name="status" required> Active</label><br>
+                                <label><input type="radio" id="RadioGroup1_0" value="hidden" ng-model="product.status" name="status" required> Hidden</label><br>
+                                <label><input type="radio" id="RadioGroup1_0" value="sold" ng-model="product.status" name="status" required> Sold Out</label><br>
+                                <label><input type="radio" id="RadioGroup1_0" value="preorder" ng-model="product.status" name="status" required> Pre-Order</label><br>
+                            </p>
+                            <div ng-show="(productForm.status.$dirty || submitted) && productForm.status.$error.required"><h4 class="error">Please choose status for product.</h4></div>
+                        </div>
+
+                        <div class="right-categry">
+                            <label class="hdng">Product Categories</label>
+                            <select name="category_id" ng-model="product.category_id" required>
+                                <option value="" selected>Select Category</option>
+                                <option ng-repeat="category in categoriesList" value="{{category.id}}"> {{ category.category_name}}</option>
+                            </select>
+                            <div ng-show="(productForm.category_id.$dirty || submitted) && productForm.category_id.$error.required"><h4 class="error">Please choose category for product.</h4></div>
+
+                            <button type='button' class="btn btn-primary ad-anothr-btn" ng-click="addanothercategory()">Add Category</button>
+                            <button ng-click="deleteCategory()" class="btn btn-danger" type="button"><i class="fa fa-trash"></i> Delete Category</button>
+                            <div ng-show="category">
+                                <input type="text" ng-model="newcategory.category_name" class="form-control catgry-name" placeholder="Category Name" name="category_name">
+                                <button type='button' class="btn btn-primary ad-anothr-save-btn" ng-click="addCategory()">Save</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- @ends right section -->
+
+            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 dash-add-prdct-save-btn">
+                <button type="submit" class="btn btn-primary dash-ad-save-btn" ng-click="submitted = true">Add Product</button>
+            </div>
+
+        </div>
+    </form>
+</div>
+
